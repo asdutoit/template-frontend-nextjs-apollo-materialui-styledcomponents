@@ -1,9 +1,24 @@
+import {useEffect} from 'react'
 import { Provider } from 'next-auth/client'
-import './styles.css'
+import '../styles/globals.css'
+import {ApolloProvider} from "@apollo/client";
+import {useApollo} from '../utils/apollo/apolloClient'
+import { ThemeProvider as StyledThemeProvider } from "styled-components";
+import { ThemeProvider as MaterialThemeProvider } from "@material-ui/core/styles";
+import { materialTheme } from "../styles/material-ui-theme";
+import { styledTheme } from "../styles/styled-components-theme";
 
 // Use the <Provider> to improve performance and allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 export default function App ({ Component, pageProps }) {
+  const apolloClient = useApollo(pageProps.initialApolloState);
+  useEffect(() => {
+    // Remove the server-side injected CSS.
+    const jssStyles = document.querySelector("#jss-server-side");
+    if (jssStyles && jssStyles.parentNode) {
+      jssStyles.parentElement.removeChild(jssStyles);
+    }
+  }, []);
   return (
     <Provider
       // Provider options are not required but can be useful in situations where
@@ -24,7 +39,13 @@ export default function App ({ Component, pageProps }) {
         keepAlive: 0
       }}
       session={pageProps.session} >
-      <Component {...pageProps} />
+        <ApolloProvider client={apolloClient}>
+        <StyledThemeProvider theme={styledTheme}>
+          <MaterialThemeProvider theme={materialTheme}>
+          <Component {...pageProps} />
+          </MaterialThemeProvider>
+          </StyledThemeProvider>
+        </ApolloProvider>
     </Provider>
   )
 }

@@ -1,6 +1,13 @@
+import {useContext} from 'react'
 import Layout from '../components/layout'
+import { useSession } from 'next-auth/client'
+
+
 
 export default function Page () {
+  const [ session, loading ] = useSession()
+  
+  session && console.log("sdfsdf", session.user.strapiToken)
   return (
     <Layout>
       <h1>Client Side Rendering</h1>

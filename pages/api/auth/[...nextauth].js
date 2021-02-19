@@ -6,40 +6,40 @@ import Providers from "next-auth/providers"
 export default NextAuth({
   // https://next-auth.js.org/configuration/providers
   providers: [
-    Providers.Email({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-    }),
-    Providers.Apple({
-      clientId: process.env.APPLE_ID,
-      clientSecret: {
-        appleId: process.env.APPLE_ID,
-        teamId: process.env.APPLE_TEAM_ID,
-        privateKey: process.env.APPLE_PRIVATE_KEY,
-        keyId: process.env.APPLE_KEY_ID,
-      },
-    }),
-    Providers.Auth0({
-      clientId: process.env.AUTH0_ID,
-      clientSecret: process.env.AUTH0_SECRET,
-      domain: process.env.AUTH0_DOMAIN,
-    }),
-    Providers.Facebook({
-      clientId: process.env.FACEBOOK_ID,
-      clientSecret: process.env.FACEBOOK_SECRET,
-    }),
-    Providers.GitHub({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
-    }),
+    // Providers.Email({
+    //   server: process.env.EMAIL_SERVER,
+    //   from: process.env.EMAIL_FROM,
+    // }),
+    // Providers.Apple({
+    //   clientId: process.env.APPLE_ID,
+    //   clientSecret: {
+    //     appleId: process.env.APPLE_ID,
+    //     teamId: process.env.APPLE_TEAM_ID,
+    //     privateKey: process.env.APPLE_PRIVATE_KEY,
+    //     keyId: process.env.APPLE_KEY_ID,
+    //   },
+    // }),
+    // Providers.Auth0({
+    //   clientId: process.env.AUTH0_ID,
+    //   clientSecret: process.env.AUTH0_SECRET,
+    //   domain: process.env.AUTH0_DOMAIN,
+    // }),
+    // Providers.Facebook({
+    //   clientId: process.env.FACEBOOK_ID,
+    //   clientSecret: process.env.FACEBOOK_SECRET,
+    // }),
+    // Providers.GitHub({
+    //   clientId: process.env.GITHUB_ID,
+    //   clientSecret: process.env.GITHUB_SECRET,
+    // }),
     Providers.Google({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
     }),
-    Providers.Twitter({
-      clientId: process.env.TWITTER_ID,
-      clientSecret: process.env.TWITTER_SECRET,
-    }),
+    // Providers.Twitter({
+    //   clientId: process.env.TWITTER_ID,
+    //   clientSecret: process.env.TWITTER_SECRET,
+    // }),
   ],
   // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
   // https://next-auth.js.org/configuration/databases
@@ -47,7 +47,7 @@ export default NextAuth({
   // Notes:
   // * You must to install an appropriate node_module for your database
   // * The Email provider requires a database (OAuth providers do not)
-  database: process.env.DATABASE_URL,
+  // database: process.env.DATABASE_URL,
 
   // The secret should be set to a reasonably long random string.
   // It is used to sign cookies and to sign and encrypt JSON Web Tokens, unless
@@ -101,9 +101,33 @@ export default NextAuth({
   callbacks: {
     // async signIn(user, account, profile) { return true },
     // async redirect(url, baseUrl) { return baseUrl },
-    // async session(session, user) { return session },
-    // async jwt(token, user, account, profile, isNewUser) { return token }
-  },
+    async session(session, user) { 
+      // console.log("SESSION: ", session)
+      // console.log("USER: ", user)
+      return {session, user} 
+    },
+    async jwt(token, user, account, profile, isNewUser) { 
+      // console.log("token", token)
+      // console.log("user", user)
+      // console.log("account", account)
+      // console.log("profile", profile)
+      // console.log("isNewUser", isNewUser)
+      const isSignIn = user ? true : false;
+      if(isSignIn){
+        const response = await fetch(
+          `${process.env.STRAPI_BACKEND}/auth/${account.provider}/callback?access_token=${account?.accessToken}`
+        );
+        const data = await response.json();
+        // console.log("DATA: ", data)
+        if (account?.accessToken) {
+          token.accessToken = account.accessToken
+          token.idToken = account.idToken
+          token.strapiToken = data.jwt
+        }
+      }
+      return Promise.resolve(token) 
+  }
+},
 
   // Events are useful for logging
   // https://next-auth.js.org/configuration/events
