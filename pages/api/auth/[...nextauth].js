@@ -1,5 +1,8 @@
-import NextAuth from "next-auth"
-import Providers from "next-auth/providers"
+import NextAuth from "next-auth";
+import Providers from "next-auth/providers";
+import axios from "axios";
+import Logout from "../../auth/Logout";
+import { signOut } from "next-auth/client";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -24,10 +27,10 @@ export default NextAuth({
     //   clientSecret: process.env.AUTH0_SECRET,
     //   domain: process.env.AUTH0_DOMAIN,
     // }),
-    // Providers.Facebook({
-    //   clientId: process.env.FACEBOOK_ID,
-    //   clientSecret: process.env.FACEBOOK_SECRET,
-    // }),
+    Providers.Facebook({
+      clientId: process.env.FACEBOOK_ID,
+      clientSecret: process.env.FACEBOOK_SECRET,
+    }),
     // Providers.GitHub({
     //   clientId: process.env.GITHUB_ID,
     //   clientSecret: process.env.GITHUB_SECRET,
@@ -88,7 +91,7 @@ export default NextAuth({
   // pages is not specified for that route.
   // https://next-auth.js.org/configuration/pages
   pages: {
-    // signIn: '/api/auth/signin',  // Displays signin buttons
+    signIn: "/auth/signin", // Displays signin buttons
     // signOut: '/api/auth/signout', // Displays form with sign out button
     // error: '/api/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/api/auth/verify-request', // Used for check email page
@@ -99,35 +102,42 @@ export default NextAuth({
   // when an action is performed.
   // https://next-auth.js.org/configuration/callbacks
   callbacks: {
-    // async signIn(user, account, profile) { return true },
-    // async redirect(url, baseUrl) { return baseUrl },
-    async session(session, user) { 
-      // console.log("SESSION: ", session)
-      // console.log("USER: ", user)
-      return {session, user} 
+    // async signIn(user, account, profile) {
+    //   return true;
+    // },
+
+    async redirect(url, baseUrl) {
+      return baseUrl;
     },
-    async jwt(token, user, account, profile, isNewUser) { 
+    async session(session, user) {
+      // console.log("SESSION: ", session);
+      // console.log("USER: ", user);
+      return { session, user };
+    },
+    async jwt(token, user, account, profile, isNewUser) {
       // console.log("token", token)
       // console.log("user", user)
       // console.log("account", account)
       // console.log("profile", profile)
       // console.log("isNewUser", isNewUser)
       const isSignIn = user ? true : false;
-      if(isSignIn){
-        const response = await fetch(
-          `${process.env.STRAPI_BACKEND}/auth/${account.provider}/callback?access_token=${account?.accessToken}`
-        );
-        const data = await response.json();
-        // console.log("DATA: ", data)
+      if (isSignIn) {
+        const response = await axios({
+          method: "GET",
+          url: `${process.env.STRAPI_BACKEND}/auth/${account.provider}/callback?access_token=${account?.accessToken}`,
+        });
+        const data = await response;
+
         if (account?.accessToken) {
-          token.accessToken = account.accessToken
-          token.idToken = account.idToken
-          token.strapiToken = data.jwt
+          token.provider = account.provider;
+          token.accessToken = account.accessToken;
+          token.idToken = account.idToken;
+          token.strapiToken = data.data.jwt;
         }
       }
-      return Promise.resolve(token) 
-  }
-},
+      return Promise.resolve(token);
+    },
+  },
 
   // Events are useful for logging
   // https://next-auth.js.org/configuration/events
@@ -135,4 +145,4 @@ export default NextAuth({
 
   // Enable debug messages in the console if you are having problems
   debug: false,
-})
+});

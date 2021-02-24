@@ -6,7 +6,7 @@ import clsx from "clsx";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Layout from '../components/layout'
+import Layout from "../components/layout";
 
 const Title = styled.h1`
   margin: 0;
@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Page () {
+export default function Page() {
   const classes = useStyles();
   const [color, setColor] = useState("primary");
   const [query, setQuery] = useState("");
@@ -79,14 +79,14 @@ export default function Page () {
   return (
     <Layout>
       <div className={styles.container}>
-      <Title cl1={color}>
+        <Title cl1={color}>
           <span>Welcome</span> to <a href="https://nextjs.org">Next.js!</a>
         </Title>
         <p className={styles.description}>
           Get started by editing{" "}
           <code className={styles.code}>pages/index.js</code>
         </p>
-        
+
         <Button onClick={handleColorChange} color={color} variant="outlined">
           Change Primary Color
         </Button>
@@ -138,7 +138,7 @@ export default function Page () {
             </p>
           </a>
         </div>
-        </div>
+      </div>
     </Layout>
-  )
+  );
 }

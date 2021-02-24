@@ -1,26 +1,23 @@
 import { useMemo } from "react";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  HttpLink,
+  InMemoryCache,
+  createHttpLink,
+} from "@apollo/client";
 
 let apolloClient;
 
+const link = createHttpLink({
+  uri: `${process.env.STRAPI_BACKEND}/graphql`,
+  credentials: "include",
+});
+
 function createApolloClient() {
+  // typeof window !== "undefined" ? initializeCookie() : null;
   return new ApolloClient({
     ssrMode: typeof window === "undefined", // set to true for SSR
-    link: new HttpLink({
-      uri: "http://localhost:1337/graphql",
-      headers: {
-        // Add a function to load token from localStorage.  The line below is merely for testing
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwMmY2NGZkNzYzZWJlMzY4MGU3OTUyNSIsImlhdCI6MTYxMzcyODM0NCwiZXhwIjoxNjE2MzIwMzQ0fQ.eQtdQUslgMDIJlZzTUs-4oU-bfjjxZ0p1rWXNWAE6E0`,
-      },
-      //credentials: "include", //  include to request a cookie from the server
-      // IF ENABLED 'credentials', you probably wont need to enable 'headers'
-      //// ====== SET THE FOLLOWING ON BACKEND SERVER =======
-      // var corsOptions = {
-      //   origin: '<insert uri of front-end domain>',
-      //   credentials: true // <-- REQUIRED backend setting
-      // };
-      // app.use(cors(corsOptions));
-    }),
+    link,
     cache: new InMemoryCache(),
   });
 }
