@@ -121,3 +121,4 @@ To do this in on Vercel, you can use the [Vercel project dashboard](https://verc
 Be sure to also set environment variables for the Client ID and Client Secret values for all your authentication providers.
 
 # template-frontend-nextjs-apollo-materialui-styledcomponents
+# template-frontend-nextjs-apollo-materialui-styledcomponents
