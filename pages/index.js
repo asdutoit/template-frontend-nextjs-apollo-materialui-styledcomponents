@@ -76,6 +76,8 @@ export default function Page() {
     if (color === "secondary") setColor("primary");
   };
 
+  // console.log(process.env.customKey);
+
   return (
     <Layout>
       <div className={styles.container}>

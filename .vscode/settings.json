@@ -1,0 +1,9 @@
+{
+  "workbench.colorTheme": "Monokai Pro (Filter Octagon)",
+  "workbench.colorCustomizations": {
+    "titleBar.activeForeground": "#000",
+    "titleBar.inactiveForeground": "#000000CC",
+    "titleBar.activeBackground": "#008cff",
+    "titleBar.inactiveBackground": "#0800ffcc"
+  }
+}

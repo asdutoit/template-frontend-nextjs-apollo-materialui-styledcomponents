@@ -30,7 +30,7 @@ export default function Header() {
     try {
       const response = await axios({
         method: "POST",
-        url: `${process.env.STRAPI_BACKEND}/logout`,
+        url: `${process.env.NEXT_PUBLIC_STRAPI_BACKEND}/logout`,
         withCredentials: true,
       });
       signOut();
@@ -38,6 +38,9 @@ export default function Header() {
       console.log(error);
     }
   };
+
+  console.log("PRocess", process.env.customKey);
+  console.log("PRocess", process.env.NEXT_PUBLIC_STRAPI_BACKEND);
 
   return (
     <header
@@ -73,7 +76,6 @@ export default function Header() {
           )}
           {session && (
             <>
-              {console.log(session.user)}
               {session.user.picture && (
                 <span
                   style={{ backgroundImage: `url(${session.user.picture})` }}
